@@ -1,0 +1,30 @@
+name: 'Sync Branches'
+description: 'Creates a sync pull request'
+author: 'Deque'
+inputs:
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    required: true
+  debug:
+    description: Whether to tell the GitHub client to log details of its requests
+    default: false
+  head:
+    description: Head branch to sync from
+    default: 'master'
+  base:
+    description: Target branch for the created pull request
+    default: 'develop'
+  body:
+    description: Created pull request body
+  title:
+    description: Title for created pull request
+    default: 'chore: merge master into develop'
+  reviewers:
+    description: Reviewers to tag on the created pull request
+  team-reviewers:
+    description: Team reviewers to tag on the created pull request
+  assignees:
+    description: Assignees to tag on the created pull request
+runs:
+  using: 'node12'
+  main: 'lib/main.js'

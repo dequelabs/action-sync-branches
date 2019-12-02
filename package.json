@@ -1,0 +1,22 @@
+{
+  "name": "action-sync-branches",
+  "version": "1.0.0",
+  "description": "Creates a sync pull request between two branches",
+  "private": true,
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Jason Wilson <jason.wilson@deque.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^1.1.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.7.2"
+  }
+}
