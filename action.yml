@@ -15,10 +15,10 @@ inputs:
     description: Target branch for the created pull request
     default: 'develop'
   pr-template:
-    description: Path to pull request pr-template
+    description: Path to pull request template
     default: '.github/pull_request_template.md'
   pr-body:
-    description: Created pull request body
+    description: Body of pull request, will use `pr-template` as the default if this is not specified
   pr-title:
     description: Title for created pull request
     default: 'chore: merge master into develop'

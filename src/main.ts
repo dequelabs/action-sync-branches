@@ -30,15 +30,13 @@ async function run() {
   })
   const pullRequestTemplate = response.data
 
-  console.log({ pullRequestTemplate })
-
   // Create PR
   const prResponse = await octokit.pulls.create({
     ...context.repo,
     title,
     head,
     base,
-    body: 'abc123'
+    body: body || Buffer.from((pullRequestTemplate as any).content, 'base64').toString()
   })
   const { number: pullNumber } = prResponse.data
 
@@ -47,8 +45,8 @@ async function run() {
     octokit.pulls.createReviewRequest({
       ...context.repo,
       pull_number: pullNumber,
-      reviewers: reviewers.split(','),
-      team_reviewers: teamReviewers.split(',')
+      reviewers: reviewers.split(',') || [],
+      team_reviewers: teamReviewers.split(',') || []
     })
   }
 
@@ -57,7 +55,7 @@ async function run() {
     octokit.issues.addAssignees({
       ...context.repo,
       issue_number: pullNumber,
-      assignees: assignees.split(',')
+      assignees: assignees.split(',') || []
     })
   }
 }
