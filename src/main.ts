@@ -24,7 +24,11 @@ async function run() {
 
   // Get PR template
   const communityMetrics = await octokit.repos.retrieveCommunityProfileMetrics({
-    ...context.repo
+    ...context.repo,
+    headers: {
+      // custom header needed for community profile metrics preview
+      accept: 'application/vnd.github.black-panther-preview+json'
+    }
   })
 
   console.log({ communityMetrics })
