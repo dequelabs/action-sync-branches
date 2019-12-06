@@ -28,14 +28,14 @@ jobs:
 
 ## Configuration
 
-* *github-token* (required) - needed to interact with github api
-* *debug* (default: `false`) - logs github api interactions to console
-* *head* (default: `master`) - head branch to sync from
-* *base* (default: `develop`) - target branch for the created pull request
-* *pr-template* (default: `.github/pull_request_template.md`) - path to pull request template
-* *pr-body* - body of pull request, will use `pr-template` as the default if this is not specified
-* *pr-title* (default: `chore: merge master into develop`) - title for the created pull request
-* *pr-labels* - labels to add to the created pull request
-* *pr-reviewers* - reviewers to tag on the created pull request
-* *pr-team-reviewers* - team reviewers to tag on the created pull request
-* *pr-assignees* - assignees to tag on the created pull request
+* **github-token** (required) - needed to interact with github api
+* **debug** (default: `false`) - logs github api interactions to console
+* **head** (default: `master`) - head branch to sync from
+* **base** (default: `develop`) - target branch for the created pull request
+* **pr-template** (default: `.github/pull_request_template.md`) - path to pull request template
+* **pr-body** - body of pull request, will use `pr-template` as the default if this is not specified
+* **pr-title** (default: `chore: merge master into develop`) - title for the created pull request
+* **pr-labels** - labels to add to the created pull request
+* **pr-reviewers** - reviewers to tag on the created pull request
+* **pr-team-reviewers** - team reviewers to tag on the created pull request
+* **pr-assignees** - assignees to tag on the created pull request
