@@ -23,6 +23,7 @@ async function run() {
   }
   const octokit = new GitHub(token, opts)
 
+  // Get PR template
   const response = await octokit.repos.getContents({
     ...context.repo,
     path: template
@@ -32,28 +33,33 @@ async function run() {
   console.log({ pullRequestTemplate })
 
   // Create PR
-  const pullRequest = await octokit.pulls.create({
+  const prResponse = await octokit.pulls.create({
     ...context.repo,
     title,
     head,
     base,
     body: 'abc123'
   })
+  const { number: pullNumber } = prResponse.data
 
   // Assign reviewers
-  // octokit.pulls.createReviewRequest({
-  //   ...context.repo,
-  //   pull_number,
-  //   reviewers: reviewers.split(','),
-  //   team_reviewers: teamReviewers.split(',')
-  // })
+  if (reviewers || teamReviewers) {
+    octokit.pulls.createReviewRequest({
+      ...context.repo,
+      pull_number: pullNumber,
+      reviewers: reviewers.split(','),
+      team_reviewers: teamReviewers.split(',')
+    })
+  }
 
   // Assign assignee
-  // octokit.issues.addAssignee({
-  //   ...context.repo,
-  //   issue_number,
-  //   assignees: assignees.split(',')
-  // })
+  if (assignees) {
+    octokit.issues.addAssignees({
+      ...context.repo,
+      issue_number: pullNumber,
+      assignees: assignees.split(',')
+    })
+  }
 }
 
 run()
