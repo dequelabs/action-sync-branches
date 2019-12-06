@@ -10,6 +10,7 @@ async function run() {
   const template = core.getInput('pr-template')
   const body = core.getInput('pr-body')
   const title = core.getInput('pr-title')
+  const labels = core.getInput('pr-labels')
   const reviewers = core.getInput('pr-reviewers')
   const teamReviewers = core.getInput('pr-team-reviewers')
   const assignees = core.getInput('pr-assignees')
@@ -40,6 +41,15 @@ async function run() {
   })
   const { number: pullNumber } = prResponse.data
 
+  // Add labels
+  if (labels) {
+    octokit.issues.addLabels({
+      ...context.repo,
+      issue_number: pullNumber,
+      labels: labels.split(',')
+    })
+  }
+
   // Assign reviewers
   if (reviewers || teamReviewers) {
     octokit.pulls.createReviewRequest({
@@ -55,7 +65,7 @@ async function run() {
     octokit.issues.addAssignees({
       ...context.repo,
       issue_number: pullNumber,
-      assignees: assignees.split(',') || []
+      assignees: assignees.split(',')
     })
   }
 }

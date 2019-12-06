@@ -22,6 +22,8 @@ inputs:
   pr-title:
     description: Title for created pull request
     default: 'chore: merge master into develop'
+  pr-labels:
+    description: Labels to add to the created pull request
   pr-reviewers:
     description: Reviewers to tag on the created pull request
   pr-team-reviewers:
