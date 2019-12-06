@@ -23,12 +23,14 @@ async function run() {
   const octokit = new GitHub(token, opts)
 
   // Get PR template
+  octokit.hook.before('request', async options => {
+    if (options.url === '/repos/:owner/:repo/community/profile') {
+      // custom header needed for community profile metrics preview
+      options.headers.accept = 'application/vnd.github.black-panther-preview+json'
+    }
+  })
   const communityMetrics = await octokit.repos.retrieveCommunityProfileMetrics({
     ...context.repo,
-    headers: {
-      // custom header needed for community profile metrics preview
-      accept: 'application/vnd.github.black-panther-preview+json'
-    }
   })
 
   console.log({ communityMetrics })
