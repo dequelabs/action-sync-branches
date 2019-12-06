@@ -7,6 +7,7 @@ async function run() {
   const token = core.getInput('github-token', { required: true })
   const head = core.getInput('head')
   const base = core.getInput('base')
+  const template = core.getInput('pr-template')
   const body = core.getInput('pr-body')
   const title = core.getInput('pr-title')
   const reviewers = core.getInput('pr-reviewers')
@@ -22,18 +23,13 @@ async function run() {
   }
   const octokit = new GitHub(token, opts)
 
-  // Get PR template
-  octokit.hook.before('request', async options => {
-    if (options.url === '/repos/:owner/:repo/community/profile') {
-      // custom header needed for community profile metrics preview
-      options.headers.accept = 'application/vnd.github.black-panther-preview+json'
-    }
-  })
-  const communityMetrics = await octokit.repos.retrieveCommunityProfileMetrics({
+  const response = await octokit.repos.getContents({
     ...context.repo,
+    path: template
   })
+  const pullRequestTemplate = response.data
 
-  console.log({ communityMetrics })
+  console.log({ pullRequestTemplate })
 
   // Create PR
   const pullRequest = await octokit.pulls.create({

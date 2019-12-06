@@ -14,16 +14,19 @@ inputs:
   base:
     description: Target branch for the created pull request
     default: 'develop'
-  body:
+  pr-template:
+    description: Path to pull request pr-template
+    default: '.github/pull_request_template.md'
+  pr-body:
     description: Created pull request body
-  title:
+  pr-title:
     description: Title for created pull request
     default: 'chore: merge master into develop'
-  reviewers:
+  pr-reviewers:
     description: Reviewers to tag on the created pull request
-  team-reviewers:
+  pr-team-reviewers:
     description: Team reviewers to tag on the created pull request
-  assignees:
+  pr-assignees:
     description: Assignees to tag on the created pull request
 runs:
   using: 'node12'
