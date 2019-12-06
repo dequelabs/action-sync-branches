@@ -7,11 +7,11 @@ async function run() {
   const token = core.getInput('github-token', { required: true })
   const head = core.getInput('head')
   const base = core.getInput('base')
-  const body = core.getInput('body')
-  const title = core.getInput('title')
-  const reviewers = core.getInput('reviewers')
-  const teamReviewers = core.getInput('team-reviewers')
-  const assignees = core.getInput('assignees')
+  const body = core.getInput('pr-body')
+  const title = core.getInput('pr-title')
+  const reviewers = core.getInput('pr-reviewers')
+  const teamReviewers = core.getInput('pr-team-reviewers')
+  const assignees = core.getInput('pr-assignees')
 
   // Mask github token
   core.setSecret(token)
@@ -27,6 +27,8 @@ async function run() {
     ...context.repo
   })
 
+  console.log({ communityMetrics })
+
   // Create PR
   const pullRequest = await octokit.pulls.create({
     ...context.repo,
@@ -40,8 +42,15 @@ async function run() {
   // octokit.pulls.createReviewRequest({
   //   ...context.repo,
   //   pull_number,
-  //   reviewers: reviewers,
-  //   team_reviewers: teamReviewers
+  //   reviewers: reviewers.split(','),
+  //   team_reviewers: teamReviewers.split(',')
+  // })
+
+  // Assign assignee
+  // octokit.issues.addAssignee({
+  //   ...context.repo,
+  //   issue_number,
+  //   assignees: assignees.split(',')
   // })
 }
 
