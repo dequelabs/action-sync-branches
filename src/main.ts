@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
 import { GitHub, context } from '@actions/github'
 
+const required = { required: true }
+
 async function run(): Promise<void> {
   const debug = core.getInput('debug')
-  const token = core.getInput('github-token', {
-    required: true
-  })
-  const head = core.getInput('head')
-  const base = core.getInput('base')
+  const token = core.getInput('github-token', required)
+  const head = core.getInput('head', required)
+  const base = core.getInput('base', required)
   const template = core.getInput('pr-template')
   const body = core.getInput('pr-body')
   const title = core.getInput('pr-title')
@@ -81,3 +81,5 @@ async function run(): Promise<void> {
 run().catch(function(err) {
   core.setFailed(err.message)
 })
+
+export default run

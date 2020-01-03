@@ -31,6 +31,12 @@ jobs:
       - checkout
       - <<: *restore_node_modules_cache
       - run: npm run lint
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *restore_node_modules_cache
+      - run: npm run test
 
 workflows:
   version: 2.1
@@ -38,5 +44,8 @@ workflows:
     jobs:
       - dependencies
       - lint:
+          requires:
+            - dependencies
+      - test:
           requires:
             - dependencies
