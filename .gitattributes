@@ -1,0 +1,2 @@
+# Mark node_modules as generated
+node_modules/* linguist-generated
