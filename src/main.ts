@@ -1,10 +1,11 @@
 import * as core from '@actions/core'
 import { GitHub, context } from '@actions/github'
 
-async function run() {
-
+async function run(): Promise<void> {
   const debug = core.getInput('debug')
-  const token = core.getInput('github-token', { required: true })
+  const token = core.getInput('github-token', {
+    required: true
+  })
   const head = core.getInput('head')
   const base = core.getInput('base')
   const template = core.getInput('pr-template')
@@ -20,7 +21,8 @@ async function run() {
 
   const opts = {}
   if (debug === 'true') {
-    (opts as any).log = console
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(opts as any).log = console
   }
   const octokit = new GitHub(token, opts)
 
@@ -37,7 +39,13 @@ async function run() {
     title,
     head,
     base,
-    body: body || Buffer.from((pullRequestTemplate as any).content, 'base64').toString()
+    body:
+      body ||
+      Buffer.from(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (pullRequestTemplate as any).content,
+        'base64'
+      ).toString()
   })
   const { number: pullNumber } = prResponse.data
 
@@ -70,7 +78,6 @@ async function run() {
   }
 }
 
-run()
-  .catch(function(err) {
-    core.setFailed(err.message)
-  })
+run().catch(function(err) {
+  core.setFailed(err.message)
+})

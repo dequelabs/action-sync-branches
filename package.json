@@ -5,7 +5,9 @@
   "private": true,
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "fmt": "prettier --write *.js 'src/**/*.ts'",
+    "lint": "eslint './src/**/*.ts'"
   },
   "author": "Jason Wilson <jason.wilson@deque.com>",
   "license": "UNLICENSED",
@@ -14,9 +16,35 @@
     "@actions/github": "^2.0.0"
   },
   "devDependencies": {
-    "tslint": "^5.20.1",
+    "@typescript-eslint/eslint-plugin": "^2.14.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.14.0",
+    "@typescript-eslint/parser": "^2.14.0",
+    "eslint": "^6.8.0",
+    "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
+    "prettier": "^1.19.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
     "typescript": "^3.7.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 60,
+    "bracketSpacing": true,
+    "useTabs": false,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
   }
 }
