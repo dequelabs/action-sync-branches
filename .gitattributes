@@ -1,2 +1,3 @@
 # Mark node_modules as generated
-node_modules/* linguist-generated
+# see documentation: https://github.com/github/linguist
+node_modules/* linguist-generated=true
