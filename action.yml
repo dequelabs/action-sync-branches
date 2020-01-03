@@ -31,5 +31,5 @@ inputs:
   pr-assignees:
     description: Assignees to tag on the created pull request
 runs:
-  using: 'node12'
-  main: 'lib/main.js'
+  using: 'docker'
+  image: 'Dockerfile'

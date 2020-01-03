@@ -39,3 +39,7 @@ jobs:
 * **pr-reviewers** - reviewers to tag on the created pull request
 * **pr-team-reviewers** - team reviewers to tag on the created pull request
 * **pr-assignees** - assignees to tag on the created pull request
+
+## License
+
+UNLICENSED
