@@ -1,8 +1,10 @@
 # Github Action Sync Branches
 
-An action to create a sync pull request whenever some branch gets a closed PR. This helps to keep downstream branches in sync.
+An action to create a pull request between two branches.
 
 ## Example Usage
+
+This action can be used to create a sync pull request when a branch gets a closed PR. This helps to keep downstream branches in sync.
 
 Here's an example of a `.github/workflows/*.yml` file to trigger the action:
 
