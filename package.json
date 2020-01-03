@@ -11,12 +11,12 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^1.1.0"
+    "@actions/github": "^2.0.0"
   },
   "devDependencies": {
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.7.2"
+    "tslint-plugin-prettier": "^2.1.0",
+    "typescript": "^3.7.4"
   }
 }
