@@ -8,7 +8,8 @@
     "build": "tsc",
     "fmt": "prettier --write *.js 'src/**/*.ts'",
     "lint": "eslint './src/**/*.ts'",
-    "test": "NODE_ENV=test ava --serial"
+    "test": "NODE_ENV=test ava --serial",
+    "release": "standard-version"
   },
   "author": "Jason Wilson <jason.wilson@deque.com>",
   "license": "UNLICENSED",
@@ -28,6 +29,7 @@
     "nock": "^11.7.1",
     "prettier": "^1.19.1",
     "sinon": "^8.0.2",
+    "standard-version": "^7.0.1",
     "ts-node": "^8.5.4",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
