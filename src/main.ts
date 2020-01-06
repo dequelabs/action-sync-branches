@@ -81,7 +81,7 @@ async function run(): Promise<void> {
 
 // Prevent action from auto-running in test environment
 if (process.env.NODE_ENV !== 'test') {
-  run().catch(function(err) {
+  run().catch(err => {
     core.setFailed(err.message)
   })
 }
