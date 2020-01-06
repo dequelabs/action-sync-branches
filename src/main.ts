@@ -10,7 +10,7 @@ async function run(): Promise<void> {
   const base = core.getInput('base', required)
   const template = core.getInput('pr-template')
   const body = core.getInput('pr-body')
-  const title = core.getInput('pr-title')
+  const title = core.getInput('pr-title', required)
   const labels = core.getInput('pr-labels')
   const reviewers = core.getInput('pr-reviewers')
   const teamReviewers = core.getInput('pr-team-reviewers')
@@ -51,7 +51,7 @@ async function run(): Promise<void> {
 
   // Add labels
   if (labels) {
-    octokit.issues.addLabels({
+    await octokit.issues.addLabels({
       ...context.repo,
       issue_number: pullNumber,
       labels: labels.split(',')
@@ -60,17 +60,18 @@ async function run(): Promise<void> {
 
   // Assign reviewers
   if (reviewers || teamReviewers) {
-    octokit.pulls.createReviewRequest({
+    await octokit.pulls.createReviewRequest({
       ...context.repo,
       pull_number: pullNumber,
-      reviewers: reviewers.split(',') || [],
-      team_reviewers: teamReviewers.split(',') || []
+      reviewers: (reviewers && reviewers.split(',')) || [],
+      team_reviewers:
+        (teamReviewers && teamReviewers.split(',')) || []
     })
   }
 
   // Assign assignee
   if (assignees) {
-    octokit.issues.addAssignees({
+    await octokit.issues.addAssignees({
       ...context.repo,
       issue_number: pullNumber,
       assignees: assignees.split(',')
@@ -78,8 +79,11 @@ async function run(): Promise<void> {
   }
 }
 
-run().catch(function(err) {
-  core.setFailed(err.message)
-})
+// Prevent action from auto-running in test environment
+if (process.env.NODE_ENV !== 'test') {
+  run().catch(function(err) {
+    core.setFailed(err.message)
+  })
+}
 
 export default run

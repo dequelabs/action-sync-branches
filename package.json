@@ -8,7 +8,7 @@
     "build": "tsc",
     "fmt": "prettier --write *.js 'src/**/*.ts'",
     "lint": "eslint './src/**/*.ts'",
-    "test": "ava"
+    "test": "NODE_ENV=test ava --serial"
   },
   "author": "Jason Wilson <jason.wilson@deque.com>",
   "license": "UNLICENSED",

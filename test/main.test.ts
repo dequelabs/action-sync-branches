@@ -3,26 +3,38 @@ import { spy, stub } from 'sinon'
 import nock from 'nock'
 import run from '../src/main'
 
-// Cache the original process.env
-const env = process.env
-
 // Prevent real api requests from going out
 nock.disableNetConnect()
 const endpoint = nock('https://api.github.com')
+
+const defaultPrParams = {
+  title: 'chore: merge master into develop',
+  head: 'master',
+  base: 'develop',
+  body: 'hello world'
+}
 
 test.beforeEach(() => {
   process.env['INPUT_GITHUB-TOKEN'] = 'donuts'
   process.env['GITHUB_REPOSITORY'] = 'foo/bar'
   process.env['INPUT_HEAD'] = 'master'
   process.env['INPUT_BASE'] = 'develop'
+  process.env['INPUT_PR-TITLE'] =
+    'chore: merge master into develop'
 })
 
 test.afterEach.always(() => {
-  process.env = env
+  for (var key of Object.keys(process.env)) {
+    if (key.startsWith('INPUT_')) {
+      delete process.env[key]
+    }
+  }
+
+  delete process.env['GITHUB_REPOSITORY']
 })
 
 // Base64 encoded "Hello World"
-const PR_TEMPLATE = 'aGVsbG8='
+const PR_TEMPLATE = 'aGVsbG8gd29ybGQ='
 const ISSUE_NUMBER = 123
 
 function createMockPrRequest() {
@@ -51,6 +63,11 @@ test('should throw an error if base branch is not present', async t => {
   await t.throwsAsync(async () => run())
 })
 
+test('should throw an error if title is not present', async t => {
+  process.env['INPUT_PR-TITLE'] = ''
+  await t.throwsAsync(async () => run())
+})
+
 test('should make a request for the pr template', async t => {
   const template = '.github/pull_request_template.md'
   process.env['INPUT_PR-TEMPLATE'] = template
@@ -74,11 +91,50 @@ test('should create the pr', async t => {
   t.true(request.isDone())
 })
 
-test.skip('should create pr with title', async t => {})
+test('should create pr with title', async t => {
+  process.env['INPUT_PR-TITLE'] = 'this is the pr title'
 
-test.skip('should create pr with body', async t => {})
+  endpoint
+    .get(/\/repos\/foo\/bar\/contents\/.*/)
+    .reply(200, { content: PR_TEMPLATE })
 
-test.skip('should add a single label', async t => {
+  const request = endpoint
+    .post('/repos/foo/bar/pulls', {
+      ...defaultPrParams,
+      title: 'this is the pr title'
+    })
+    .reply(200, {
+      number: ISSUE_NUMBER
+    })
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should create pr with body', async t => {
+  process.env['INPUT_PR-BODY'] =
+    'up up down down left right b a start'
+
+  endpoint
+    .get(/\/repos\/foo\/bar\/contents\/.*/)
+    .reply(200, { content: PR_TEMPLATE })
+
+  const request = endpoint
+    .post('/repos/foo/bar/pulls', {
+      ...defaultPrParams,
+      body: 'up up down down left right b a start'
+    })
+    .reply(200, {
+      number: ISSUE_NUMBER
+    })
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should add a single label', async t => {
   process.env['INPUT_PR-LABELS'] = 'chore'
 
   createMockPrRequest()
@@ -90,11 +146,11 @@ test.skip('should add a single label', async t => {
     .reply(200)
 
   await run()
-  // console.log(request)
+
   t.true(request.isDone())
 })
 
-test.skip('should add multiple labels', async t => {
+test('should add multiple labels', async t => {
   process.env['INPUT_PR-LABELS'] = 'chore1,chore2'
 
   createMockPrRequest()
@@ -110,14 +166,103 @@ test.skip('should add multiple labels', async t => {
   t.true(request.isDone())
 })
 
-test.skip('should add a reviewer', t => {})
+test('should add a reviewer', async t => {
+  process.env['INPUT_PR-REVIEWERS'] = 'scurker'
 
-test.skip('should add multiple reviewers', t => {})
+  createMockPrRequest()
 
-test.skip('should add a team reviewer', t => {})
+  const request = endpoint
+    .post('/repos/foo/bar/pulls/123/requested_reviewers', {
+      reviewers: ['scurker'],
+      team_reviewers: []
+    })
+    .reply(200)
 
-test.skip('should add multiple team reviewers', t => {})
+  await run()
 
-test.skip('should add an assignee', t => {})
+  t.true(request.isDone())
+})
 
-test.skip('should add multiple assignees', t => {})
+test('should add multiple reviewers', async t => {
+  process.env['INPUT_PR-REVIEWERS'] = 'scurker,straker'
+
+  createMockPrRequest()
+
+  const request = endpoint
+    .post('/repos/foo/bar/pulls/123/requested_reviewers', {
+      reviewers: ['scurker', 'straker'],
+      team_reviewers: []
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should add a team reviewer', async t => {
+  process.env['INPUT_PR-TEAM-REVIEWERS'] = 'htmlteam'
+
+  createMockPrRequest()
+
+  const request = endpoint
+    .post('/repos/foo/bar/pulls/123/requested_reviewers', {
+      reviewers: [],
+      team_reviewers: ['htmlteam']
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should add multiple team reviewers', async t => {
+  process.env['INPUT_PR-TEAM-REVIEWERS'] =
+    'htmlteam,adminteam'
+
+  createMockPrRequest()
+
+  const request = endpoint
+    .post('/repos/foo/bar/pulls/123/requested_reviewers', {
+      reviewers: [],
+      team_reviewers: ['htmlteam', 'adminteam']
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should add an assignee', async t => {
+  process.env['INPUT_PR-ASSIGNEES'] = 'scurker'
+
+  createMockPrRequest()
+
+  const request = endpoint
+    .post('/repos/foo/bar/issues/123/assignees', {
+      assignees: ['scurker']
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(request.isDone())
+})
+
+test('should add multiple assignees', async t => {
+  process.env['INPUT_PR-ASSIGNEES'] = 'scurker,straker'
+
+  createMockPrRequest()
+
+  const request = endpoint
+    .post('/repos/foo/bar/issues/123/assignees', {
+      assignees: ['scurker', 'straker']
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(request.isDone())
+})

@@ -11,9 +11,11 @@ inputs:
   head:
     description: Head branch to sync from
     default: 'master'
+    required: true
   base:
     description: Target branch for the created pull request
     default: 'develop'
+    required: true
   pr-template:
     description: Path to pull request template
     default: '.github/pull_request_template.md'
@@ -22,6 +24,7 @@ inputs:
   pr-title:
     description: Title for created pull request
     default: 'chore: merge master into develop'
+    required: true
   pr-labels:
     description: Labels to add to the created pull request
   pr-reviewers:
