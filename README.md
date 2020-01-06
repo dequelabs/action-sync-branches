@@ -30,6 +30,8 @@ jobs:
 
 ## Configuration
 
+Using this as a github action, you can use the [built in generated](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token) `GITHUB_TOKEN`.
+
 - **github-token** (required) - needed to interact with github api
 - **debug** (default: `false`) - logs github api interactions to console
 - **head** (default: `master`, required) - head branch to sync from
