@@ -8,7 +8,7 @@ This action can be used to create a sync pull request when a branch gets a close
 
 Here's an example of a `.github/workflows/*.yml` file to trigger the action:
 
-```
+```yml
 name: Sync master/develop branches
 
 on:
