@@ -1,0 +1,38 @@
+name: 'Sync Branches'
+description: 'Creates a sync pull request'
+author: 'Deque'
+inputs:
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    required: true
+  debug:
+    description: Whether to tell the GitHub client to log details of its requests
+    default: false
+  head:
+    description: Head branch to sync from
+    default: 'master'
+    required: true
+  base:
+    description: Target branch for the created pull request
+    default: 'develop'
+    required: true
+  pr-template:
+    description: Path to pull request template
+    default: '.github/pull_request_template.md'
+  pr-body:
+    description: Body of pull request, will use `pr-template` as the default if this is not specified
+  pr-title:
+    description: Title for created pull request
+    default: 'chore: merge master into develop'
+    required: true
+  pr-labels:
+    description: Labels to add to the created pull request
+  pr-reviewers:
+    description: Reviewers to tag on the created pull request
+  pr-team-reviewers:
+    description: Team reviewers to tag on the created pull request
+  pr-assignees:
+    description: Assignees to tag on the created pull request
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
