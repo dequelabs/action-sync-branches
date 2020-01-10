@@ -30,6 +30,8 @@ jobs:
 
 ## Configuration
 
+> Note: If you need to assign team reviewers you will need to use a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line), as the `GITHUB_TOKEN` generated via an action does not have [right permissions to assign teams](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#permissions-for-the-github_token).
+
 - **github-token** (required) - needed to interact with github api
 - **debug** (default: `false`) - logs github api interactions to console
 - **head** (default: `master`, required) - head branch to sync from
