@@ -27,11 +27,22 @@ async function run(): Promise<void> {
   const octokit = new GitHub(token, opts)
 
   // Get PR template
-  const response = await octokit.repos.getContents({
-    ...context.repo,
-    path: template
-  })
-  const pullRequestTemplate = response.data
+  let pullRequestTemplate = null
+  try {
+    const response = await octokit.repos.getContents({
+      ...context.repo,
+      path: template
+    })
+    pullRequestTemplate = response.data
+  } catch (err) {
+    if (err.status === 404 && err.message === 'Not Found') {
+      console.log(
+        `Unable to find pr-template "${template}"`
+      )
+    } else {
+      throw err
+    }
+  }
 
   // Create PR
   const prResponse = await octokit.pulls.create({
@@ -43,7 +54,9 @@ async function run(): Promise<void> {
       body ||
       Buffer.from(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (pullRequestTemplate as any).content,
+        pullRequestTemplate
+          ? (pullRequestTemplate as any).content
+          : '',
         'base64'
       ).toString()
   })
