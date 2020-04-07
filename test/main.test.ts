@@ -84,6 +84,42 @@ test('should make a request for the pr template', async t => {
   t.true(request.isDone())
 })
 
+test('should skip "not found" pr templates', async t => {
+  const template = '.github/pull_request_template.md'
+  process.env['INPUT_PR-TEMPLATE'] = template
+
+  endpoint
+    .get(
+      '/repos/foo/bar/contents/.github/pull_request_template.md'
+    )
+    .reply(404, {
+      message: 'Not Found',
+      documentation_url:
+        'https://developer.github.com/v3/repos/contents/#get-contents'
+    })
+  const request = endpoint
+    .post('/repos/foo/bar/pulls')
+    .reply(200, {
+      number: ISSUE_NUMBER
+    })
+
+  await t.notThrowsAsync(async () => run())
+  t.true(request.isDone())
+})
+
+test('should throw error when fetching pr template contents returns an unknown error', async t => {
+  const template = '.github/pull_request_template.md'
+  process.env['INPUT_PR-TEMPLATE'] = template
+
+  const request = endpoint
+    .get(
+      '/repos/foo/bar/contents/.github/pull_request_template.md'
+    )
+    .reply(500, { message: 'Unknown Error' })
+
+  await t.throwsAsync(async () => run())
+})
+
 test('should create the pr', async t => {
   const request = createMockPrRequest()
   await run()
