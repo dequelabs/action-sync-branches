@@ -12,9 +12,9 @@ Here's an example of a `.github/workflows/*.yml` file to trigger the action:
 name: Sync master/develop branches
 
 on:
-  pull_request:
-    types: [closed]
-    branches: master
+  push:
+    branches:
+      - master
 
 jobs:
   create_sync_pull_request:
