@@ -13,5 +13,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-title: "chore: merge master into develop"
-          pr-team-reviewers: dequelabs/html-team
+          pr-reviewers: scurker,stephenmathieson
           pr-labels: chore
