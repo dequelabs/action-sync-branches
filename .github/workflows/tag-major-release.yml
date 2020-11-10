@@ -13,6 +13,6 @@ jobs:
       - uses: actions/setup-node@v1
       - run: |
           VERSION=$(node -p 'require("./package.json").version')
-          MAJOR_VERSION="${VERSION%%.*}
+          MAJOR_VERSION="${VERSION%%.*}"
           git tag -f -a "v$MAJOR_VERSION"
           git push origin "refs/tags/v$MAJOR_VERSION"
