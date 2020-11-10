@@ -3,7 +3,7 @@ name: Update major release tag
 on:
   push:
     branches:
-      - tag-major-releases
+      - master
 
 jobs:
   update_tag:
