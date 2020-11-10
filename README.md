@@ -20,10 +20,10 @@ jobs:
   create_sync_pull_request:
     runs-on: ubuntu-latest
     steps:
-      - uses: dequelabs/action-sync-branches@v1.0.0
+      - uses: dequelabs/action-sync-branches@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-title: "chore: merge master into develop"
+          pr-title: 'chore: merge master into develop'
           pr-reviewers: scurker
           pr-labels: chore
 ```
