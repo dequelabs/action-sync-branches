@@ -8,13 +8,13 @@ This action can be used to create a sync pull request when a branch gets a close
 
 Here's an example of a `.github/workflows/*.yml` file to trigger the action:
 
-```
+```yml
 name: Sync master/develop branches
 
 on:
-  pull_request:
-    types: [closed]
-    branches: master
+  push:
+    branches:
+      - master
 
 jobs:
   create_sync_pull_request:
@@ -23,12 +23,14 @@ jobs:
       - uses: dequelabs/action-sync-branches@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-title: "chore: merge master into develop"
+          pr-title: 'chore: merge master into develop'
           pr-reviewers: scurker
           pr-labels: chore
 ```
 
 ## Configuration
+
+> Note: If you need to assign team reviewers you will need to use a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line), as the `GITHUB_TOKEN` generated via an action does not have [right permissions to assign teams](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#permissions-for-the-github_token).
 
 - **github-token** (required) - needed to interact with github api
 - **debug** (default: `false`) - logs github api interactions to console
