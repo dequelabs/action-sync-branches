@@ -1,0 +1,22 @@
+name: Update major release tag
+
+on:
+  push:
+    branches:
+      - tag-major-releases
+
+jobs:
+  build:
+    name: Update tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - name: Update release tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          MAJOR_VERSION="${VERSION%%.*}
+          git tag -f -a "v$MAJOR_VERSION"
+          git push origin "refs/tags/v$MAJOR_VERSION"
