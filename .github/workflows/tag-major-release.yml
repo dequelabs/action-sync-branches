@@ -6,8 +6,7 @@ on:
       - tag-major-releases
 
 jobs:
-  build:
-    name: Update tag
+  update_tag:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
