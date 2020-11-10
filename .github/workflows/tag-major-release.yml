@@ -16,5 +16,11 @@ jobs:
           git config user.email github-actions@github.com
           VERSION=$(node -p 'require("./package.json").version')
           MAJOR_VERSION="${VERSION%%.*}"
+
+          if [ -z "$VERSION" ] || [ -z "$MAJOR_VERSION" ]; then
+            echo "VERSION or MAJOR_VERSION cannot be empty"
+            exit 1
+          fi
+
           git tag -f -a "v$MAJOR_VERSION" -m "update v$MAJOR_VERSION tag"
-          git push origin "refs/tags/v$MAJOR_VERSION"
+          git push -f origin "refs/tags/v$MAJOR_VERSION"
