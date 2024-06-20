@@ -49,6 +49,8 @@ async function run(): Promise<void> {
   } catch (err) {
     const { status, message } = err as OctokitHttpError
     if (
+      // Careful; we've seen octokit give status as both a string
+      // and a number, see #45
       String(status) === '404' &&
       /Not Found/.test(String(message))
     ) {
