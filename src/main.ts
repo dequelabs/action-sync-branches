@@ -35,7 +35,12 @@ async function run(): Promise<void> {
     })
     pullRequestTemplate = response.data
   } catch (err) {
-    if (err.status === 404 && err.message === 'Not Found') {
+    // Careful; `err.status` can be either a string or a number depending on
+    // octokit version.
+    if (
+      String(err.status) === '404' &&
+      err.message === 'Not Found'
+    ) {
       console.log(
         `Unable to find pr-template "${template}"`
       )
