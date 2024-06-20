@@ -2,7 +2,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: circleci/node:12
+    - image: circleci/node:20
   working_directory: ~/action-sync-branches
 
 npm_cache_key: &npm_cache_key
