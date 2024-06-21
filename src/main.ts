@@ -1,5 +1,14 @@
 import * as core from '@actions/core'
-import { GitHub, context } from '@actions/github'
+import { getOctokit, context } from '@actions/github'
+
+type OctokitOptions = NonNullable<
+  Parameters<typeof getOctokit>[1]
+>
+type OctokitHttpError = {
+  // Yes, we've seen it give back either type, see #45
+  status: number | string
+  message: string
+}
 
 const required = { required: true }
 
@@ -19,23 +28,32 @@ async function run(): Promise<void> {
   // Mask github token
   core.setSecret(token)
 
-  const opts = {}
+  const opts: OctokitOptions = {}
   if (debug === 'true') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(opts as any).log = console
+    opts.log = console
   }
-  const octokit = new GitHub(token, opts)
+  if (process.env.NODE_ENV === 'test') {
+    // See https://github.com/nock/nock/issues/2183
+    opts.request = { fetch: require('node-fetch') }
+  }
+  const octokit = getOctokit(token, opts)
 
   // Get PR template
   let pullRequestTemplate = null
   try {
-    const response = await octokit.repos.getContents({
+    const response = await octokit.rest.repos.getContent({
       ...context.repo,
       path: template
     })
     pullRequestTemplate = response.data
   } catch (err) {
-    if (err.status === 404 && err.message === 'Not Found') {
+    const { status, message } = err as OctokitHttpError
+    if (
+      // Careful; we've seen octokit give status as both a string
+      // and a number, see #45
+      String(status) === '404' &&
+      /Not Found/.test(String(message))
+    ) {
       console.log(
         `Unable to find pr-template "${template}"`
       )
@@ -45,7 +63,7 @@ async function run(): Promise<void> {
   }
 
   // Create PR
-  const prResponse = await octokit.pulls.create({
+  const prResponse = await octokit.rest.pulls.create({
     ...context.repo,
     title,
     head,
@@ -53,9 +71,9 @@ async function run(): Promise<void> {
     body:
       body ||
       Buffer.from(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         pullRequestTemplate
-          ? (pullRequestTemplate as any).content
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (pullRequestTemplate as any).content
           : '',
         'base64'
       ).toString()
@@ -64,7 +82,7 @@ async function run(): Promise<void> {
 
   // Add labels
   if (labels) {
-    await octokit.issues.addLabels({
+    await octokit.rest.issues.addLabels({
       ...context.repo,
       issue_number: pullNumber,
       labels: labels.split(',')
@@ -73,7 +91,7 @@ async function run(): Promise<void> {
 
   // Assign reviewers
   if (reviewers || teamReviewers) {
-    await octokit.pulls.createReviewRequest({
+    await octokit.rest.pulls.requestReviewers({
       ...context.repo,
       pull_number: pullNumber,
       reviewers: (reviewers && reviewers.split(',')) || [],
@@ -84,7 +102,7 @@ async function run(): Promise<void> {
 
   // Assign assignee
   if (assignees) {
-    await octokit.issues.addAssignees({
+    await octokit.rest.issues.addAssignees({
       ...context.repo,
       issue_number: pullNumber,
       assignees: assignees.split(',')

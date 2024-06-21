@@ -1,5 +1,4 @@
 import test from 'ava'
-import { spy, stub } from 'sinon'
 import nock from 'nock'
 import run from '../src/main'
 
@@ -39,7 +38,7 @@ const ISSUE_NUMBER = 123
 
 function createMockPrRequest() {
   endpoint
-    .get(/\/repos\/foo\/bar\/contents\/.*/)
+    .get(/\/repos\/foo\/bar\/contents.*/)
     .optionally()
     .reply(200, { content: PR_TEMPLATE })
 
@@ -74,7 +73,7 @@ test('should make a request for the pr template', async t => {
 
   const request = endpoint
     .get(
-      '/repos/foo/bar/contents/.github/pull_request_template.md'
+      '/repos/foo/bar/contents/.github%2Fpull_request_template.md'
     )
     .reply(200, { content: PR_TEMPLATE })
   endpoint.post('/repos/foo/bar/pulls').reply(200)
@@ -90,7 +89,7 @@ test('should skip "not found" pr templates', async t => {
 
   endpoint
     .get(
-      '/repos/foo/bar/contents/.github/pull_request_template.md'
+      '/repos/foo/bar/contents/.github%2Fpull_request_template.md'
     )
     .reply(404, {
       message: 'Not Found',
@@ -113,7 +112,7 @@ test('should throw error when fetching pr template contents returns an unknown e
 
   const request = endpoint
     .get(
-      '/repos/foo/bar/contents/.github/pull_request_template.md'
+      '/repos/foo/bar/contents/.github%2Fpull_request_template.md'
     )
     .reply(500, { message: 'Unknown Error' })
 
@@ -131,7 +130,7 @@ test('should create pr with title', async t => {
   process.env['INPUT_PR-TITLE'] = 'this is the pr title'
 
   endpoint
-    .get(/\/repos\/foo\/bar\/contents\/.*/)
+    .get(/\/repos\/foo\/bar\/contents.*/)
     .reply(200, { content: PR_TEMPLATE })
 
   const request = endpoint
@@ -153,7 +152,7 @@ test('should create pr with body', async t => {
     'up up down down left right b a start'
 
   endpoint
-    .get(/\/repos\/foo\/bar\/contents\/.*/)
+    .get(/\/repos\/foo\/bar\/contents.*/)
     .reply(200, { content: PR_TEMPLATE })
 
   const request = endpoint
