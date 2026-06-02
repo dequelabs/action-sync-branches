@@ -90,14 +90,25 @@ async function run(): Promise<void> {
       console.log(
         `A pull request from "${head}" into "${base}" already exists, skipping creation.`
       )
-      const { data: existingPRs } = await octokit.rest.pulls.list({
-        ...context.repo,
-        head: `${context.repo.owner}:${head}`,
-        base,
-        state: 'open'
-      })
-      if (!existingPRs.length) return
+      const { data: existingPRs } =
+        await octokit.rest.pulls.list({
+          ...context.repo,
+          head: `${context.repo.owner}:${head}`,
+          base,
+          state: 'open'
+        })
+      if (!existingPRs.length) {
+        const errorMessage =
+          `GitHub reported that a pull request from "${head}" into "${base}" already exists, ` +
+          `but no open pull request was found via pulls.list ` +
+          `(head="${context.repo.owner}:${head}", base="${base}").`
+        core.error(errorMessage)
+        throw new Error(errorMessage)
+      }
       pullNumber = existingPRs[0].number
+      console.log(
+        `Found existing PR #${pullNumber} for "${head}" into "${base}", continuing with labels/reviewers/assignees.`
+      )
     } else {
       throw err
     }
