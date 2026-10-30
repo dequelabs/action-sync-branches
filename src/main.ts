@@ -63,22 +63,56 @@ async function run(): Promise<void> {
   }
 
   // Create PR
-  const prResponse = await octokit.rest.pulls.create({
-    ...context.repo,
-    title,
-    head,
-    base,
-    body:
-      body ||
-      Buffer.from(
-        pullRequestTemplate
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (pullRequestTemplate as any).content
-          : '',
-        'base64'
-      ).toString()
-  })
-  const { number: pullNumber } = prResponse.data
+  let pullNumber: number
+  try {
+    const prResponse = await octokit.rest.pulls.create({
+      ...context.repo,
+      title,
+      head,
+      base,
+      body:
+        body ||
+        Buffer.from(
+          pullRequestTemplate
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (pullRequestTemplate as any).content
+            : '',
+          'base64'
+        ).toString()
+    })
+    pullNumber = prResponse.data.number
+  } catch (err) {
+    const { status, message } = err as OctokitHttpError
+    if (
+      String(status) === '422' &&
+      /A pull request already exists/.test(String(message))
+    ) {
+      console.log(
+        `A pull request from "${head}" into "${base}" already exists, skipping creation.`
+      )
+      const { data: existingPRs } =
+        await octokit.rest.pulls.list({
+          ...context.repo,
+          head: `${context.repo.owner}:${head}`,
+          base,
+          state: 'open'
+        })
+      if (!existingPRs.length) {
+        const errorMessage =
+          `GitHub reported that a pull request from "${head}" into "${base}" already exists, ` +
+          `but no open pull request was found via pulls.list ` +
+          `(head="${context.repo.owner}:${head}", base="${base}").`
+        core.error(errorMessage)
+        throw new Error(errorMessage)
+      }
+      pullNumber = existingPRs[0].number
+      console.log(
+        `Found existing PR #${pullNumber} for "${head}" into "${base}", continuing with labels/reviewers/assignees.`
+      )
+    } else {
+      throw err
+    }
+  }
 
   // Add labels
   if (labels) {

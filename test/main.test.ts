@@ -301,3 +301,101 @@ test('should add multiple assignees', async t => {
 
   t.true(request.isDone())
 })
+
+test('should recover from 422 "PR already exists" and apply labels to the existing PR', async t => {
+  process.env['INPUT_PR-LABELS'] = 'chore'
+
+  endpoint
+    .get(/\/repos\/foo\/bar\/contents.*/)
+    .optionally()
+    .reply(200, { content: PR_TEMPLATE })
+
+  // Simulate the duplicate-PR case
+  endpoint.post('/repos/foo/bar/pulls').reply(422, {
+    message: 'Validation Failed',
+    errors: [
+      {
+        resource: 'PullRequest',
+        code: 'custom',
+        message:
+          'A pull request already exists for foo:master.'
+      }
+    ]
+  })
+
+  // Octokit's pulls.list call to find the existing PR
+  const listRequest = endpoint
+    .get('/repos/foo/bar/pulls')
+    .query({
+      head: 'foo:master',
+      base: 'develop',
+      state: 'open'
+    })
+    .reply(200, [{ number: ISSUE_NUMBER }])
+
+  // Labels should be applied to the existing PR number
+  const labelsRequest = endpoint
+    .post('/repos/foo/bar/issues/123/labels', {
+      labels: ['chore']
+    })
+    .reply(200)
+
+  await run()
+
+  t.true(listRequest.isDone())
+  t.true(labelsRequest.isDone())
+})
+
+test('should throw when 422 "PR already exists" but pulls.list returns no open PRs', async t => {
+  endpoint
+    .get(/\/repos\/foo\/bar\/contents.*/)
+    .optionally()
+    .reply(200, { content: PR_TEMPLATE })
+
+  endpoint.post('/repos/foo/bar/pulls').reply(422, {
+    message: 'Validation Failed',
+    errors: [
+      {
+        resource: 'PullRequest',
+        code: 'custom',
+        message:
+          'A pull request already exists for foo:master.'
+      }
+    ]
+  })
+
+  endpoint
+    .get('/repos/foo/bar/pulls')
+    .query({
+      head: 'foo:master',
+      base: 'develop',
+      state: 'open'
+    })
+    .reply(200, [])
+
+  await t.throwsAsync(async () => run(), {
+    message:
+      /already exists.*no open pull request was found via pulls\.list/s
+  })
+})
+
+test('should re-throw non-duplicate 422 errors from pulls.create', async t => {
+  endpoint
+    .get(/\/repos\/foo\/bar\/contents.*/)
+    .optionally()
+    .reply(200, { content: PR_TEMPLATE })
+
+  endpoint.post('/repos/foo/bar/pulls').reply(422, {
+    message: 'Validation Failed',
+    errors: [
+      {
+        resource: 'PullRequest',
+        code: 'invalid',
+        field: 'base',
+        message: 'Base does not exist'
+      }
+    ]
+  })
+
+  await t.throwsAsync(async () => run())
+})
