@@ -1,6 +1,6 @@
 {
   "name": "action-sync-branches",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Creates a sync pull request between two branches",
   "private": true,
   "main": "lib/main.js",
